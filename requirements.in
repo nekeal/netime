@@ -1,1 +1,5 @@
 click
+ipython
+black
+isort
+matplotlib
