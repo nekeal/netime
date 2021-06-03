@@ -1,4 +1,6 @@
 import logging
+from logging.handlers import SysLogHandler
+logger = logging.getLogger(__name__)
 
 logging.root.handlers = []
 logging.basicConfig(
@@ -6,12 +8,15 @@ logging.basicConfig(
     level=logging.DEBUG,
     filename="debug.log",
 )
+main_formatter = logging.Formatter("%(levelname)s: %(message)s")
 
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-logging.getLogger(__name__).addHandler(console)
+console.setFormatter(main_formatter)
+logger.addHandler(console)
 
-stream_formatter = logging.Formatter("%(levelname)s: %(message)s")
-console.setFormatter(stream_formatter)
+_syslog_handler = SysLogHandler(address="/dev/log")
+_syslog_handler.setFormatter(main_formatter)
+logger.addHandler(_syslog_handler)
 
-logger = logging.getLogger(__name__)
+
