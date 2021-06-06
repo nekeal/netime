@@ -2,6 +2,7 @@ import time
 
 import click
 
+from netime import settings
 from netime.client import ClientRTTService, UDPClient
 from netime.server import UDPServer
 
@@ -13,7 +14,7 @@ def cli():
 
 @cli.command()
 @click.option("-s", "--server-address", default="127.0.0.1", help="Server address")
-@click.option("-p", "--port", default=8888, type=int, help="Server port")
+@click.option("-p", "--port", default=settings.SERVICE_PORT, type=int, help="Server port")
 @click.option("-t", "--timeout", default=1, type=float, help="Timeout for socket")
 @click.option("-n", default=100, type=int, help="Number of packets to send")
 def run_client(server_address: str, port: int, timeout: int, n: int):
@@ -28,7 +29,7 @@ def run_client(server_address: str, port: int, timeout: int, n: int):
 
 @cli.command()
 @click.option("-s", "--server-address", default="127.0.0.1", help="Server address")
-@click.option("-p", "--port", default=8888, type=int, help="Server port")
+@click.option("-p", "--port", default=settings.SERVICE_PORT, type=int, help="Server port")
 @click.option("-m", "--mean-delay", default=0, type=float, help="Server mean delay")
 @click.option("-d", "--std-delay", default=0, type=float, help="Server standard deviation delay")
 @click.option("-l", "--loss-chance", default=0, type=float, help="Server chance do loss packet")
