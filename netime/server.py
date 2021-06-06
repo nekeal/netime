@@ -1,7 +1,9 @@
 import random
+import socket
+import struct
 import time
 
-from netime import logger
+from netime import logger, settings
 from netime.client import UDPClient
 
 
@@ -16,7 +18,10 @@ class UDPServer(UDPClient):
 
     def bind(self, addr, port):
         self._addr = (addr, port)
-        self._socket.bind(self._addr)
+        self._socket.bind((addr, port))
+        if addr == "0.0.0.0":
+            mreq = struct.pack("4sl", socket.inet_aton(settings.MULTICAST_GROUP), socket.INADDR_ANY)
+            self._socket.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
     def wait(self):
         value = random.gauss(self._delay_mean, self._delay_std)
