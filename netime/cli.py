@@ -2,7 +2,7 @@ import time
 
 import click
 
-from netime import settings
+from netime import settings, logger
 from netime.client import ClientRTTService, UDPClient
 from netime.server import UDPServer
 
@@ -15,10 +15,14 @@ def cli():
 @cli.command()
 @click.option("-s", "--server-address", default="127.0.0.1", help="Server address")
 @click.option("-p", "--port", default=settings.SERVICE_PORT, type=int, help="Server port")
+@click.option("-d", "--discover", is_flag=True, help="Use service discovery")
 @click.option("-t", "--timeout", default=1, type=float, help="Timeout for socket")
 @click.option("-n", default=100, type=int, help="Number of packets to send")
-def run_client(server_address: str, port: int, timeout: int, n: int):
+def run_client(server_address: str, port: int, discover, timeout: int, n: int):
     client = UDPClient(timeout)
+    if discover:
+        server_address = client.detect_server()
+        logger.info(f"Discovered server at address {server_address}")
     client.connect(server_address, port)
     service = ClientRTTService(client)
     for _ in range(n):
@@ -28,7 +32,7 @@ def run_client(server_address: str, port: int, timeout: int, n: int):
 
 
 @cli.command()
-@click.option("-s", "--server-address", default="127.0.0.1", help="Server address")
+@click.option("-s", "--server-address", default="0.0.0.0", help="Server address")
 @click.option("-p", "--port", default=settings.SERVICE_PORT, type=int, help="Server port")
 @click.option("-m", "--mean-delay", default=0, type=float, help="Server mean delay")
 @click.option("-d", "--std-delay", default=0, type=float, help="Server standard deviation delay")

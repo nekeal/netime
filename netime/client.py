@@ -4,13 +4,14 @@ from typing import List, Optional, Tuple
 
 from matplotlib import pyplot as plt
 
-from netime import logger
+from netime import logger, settings
 from netime.utils import Addr
 
 
 class UDPClient:
     def __init__(self, timeout=None):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self._socket.setsockopt(socket.IPPROTO_IP, socket.SO_REUSEADDR, 1)
         self._destination: Optional[Tuple[str, int]] = None
 
         if timeout:
@@ -26,7 +27,7 @@ class UDPClient:
         logger.debug("Sending packet to %s", destination[0])
         self._socket.sendto(message.encode(), self._get_destination(destination))
 
-    def receive(self) -> Optional[Tuple[Optional[bytes], Optional[Tuple]]]:
+    def receive(self) -> Tuple[Optional[bytes], Optional[Tuple]]:
         try:
             data, addr = self._socket.recvfrom(1000)
             logger.debug("Received data from %s on port %s", addr[0], addr[1])
@@ -34,6 +35,11 @@ class UDPClient:
         except socket.timeout:
             logger.warning("Timeout on receive")
             return None, None
+
+    def detect_server(self, multicast_addr: str = settings.MULTICAST_GROUP, port: int = settings.SERVICE_PORT):
+        self.send("", (multicast_addr, port))
+        data, addr = self.receive()
+        return addr[0]
 
     def connect(self, ip: str, port: int):
         self._destination = (ip, port)
