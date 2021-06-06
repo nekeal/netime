@@ -30,7 +30,7 @@ def run_client(server_address: str, port: int, timeout: int, n: int):
 @click.option("-s", "--server-address", default="127.0.0.1", help="Server address")
 @click.option("-p", "--port", default=8888, type=int, help="Server port")
 @click.option("-m", "--mean-delay", default=0, type=float, help="Server mean delay")
-@click.option("-d", "--std-delay", default=0, type=float, help="Server standar deviation delay")
+@click.option("-d", "--std-delay", default=0, type=float, help="Server standard deviation delay")
 @click.option("-l", "--loss-chance", default=0, type=float, help="Server chance do loss packet")
 def run_server(server_address: str, port: int, mean_delay, std_delay, loss_chance):
     server = UDPServer(mean_delay, std_delay, loss_chance)
